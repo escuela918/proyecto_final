@@ -1,0 +1,328 @@
+.lector {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+  color: #fff;
+}
+
+/* ---------- Barra superior ---------- */
+.lector-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.lector-back,
+.lector-open,
+.lector-mode {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 8px 14px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.lector-back:hover,
+.lector-open:hover,
+.lector-mode:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+.lector-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.lector-title .serif {
+  font-size: 18px;
+}
+
+.lector-count {
+  font-size: 11px;
+  opacity: 0.6;
+  letter-spacing: 0.1em;
+}
+
+.lector-modes {
+  display: flex;
+}
+
+.lector-mode {
+  border-radius: 0;
+}
+
+.lector-mode + .lector-mode {
+  border-left: 0;
+}
+
+.lector-mode.active {
+  background: #fff;
+  color: #0a0a0a;
+  border-color: #fff;
+}
+
+.lector-error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Visor PDF ---------- */
+.pdf-viewer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.pdf-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background: #141414;
+}
+
+.pdf-stage-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Si el zoom hace crecer las páginas, el contenedor se desplaza. */
+.pdf-stage-libro {
+  overflow: auto;
+  display: flex;
+}
+
+.pdf-book {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+}
+
+.pdf-stage-vertical {
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.pdf-stage-vertical .pdf-page {
+  margin: 0 auto;
+}
+
+.pdf-stage .react-pdf__Document {
+  display: contents;
+}
+
+.pdf-page {
+  background: #fff;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+  flex-shrink: 0;
+}
+
+.pdf-page canvas {
+  display: block;
+}
+
+.pdf-hueco {
+  flex-shrink: 0;
+}
+
+.pdf-msg {
+  padding: 40px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.pdf-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 64px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 2;
+}
+
+.pdf-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pdf-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.pdf-arrow-left {
+  left: 10px;
+}
+
+.pdf-arrow-right {
+  right: 10px;
+}
+
+.pdf-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 16px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pdf-status-page {
+  opacity: 0.7;
+}
+
+.pdf-zoom {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdf-zoom-label {
+  opacity: 0.6;
+  margin-right: 4px;
+}
+
+.pdf-zoom button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  min-width: 28px;
+  height: 26px;
+  padding: 0 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.pdf-zoom button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+.pdf-zoom button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.pdf-zoom-value {
+  min-width: 44px;
+  text-align: center;
+}
+
+.pdf-zoom-reset {
+  font-size: 10px !important;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Barra inferior (libro anterior / siguiente) ---------- */
+.lector-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.95);
+}
+
+.lector-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  max-width: 48%;
+}
+
+.lector-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+}
+
+.lector-nav-btn .mono {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.lector-nav-btn strong {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.lector-nav-next {
+  align-items: flex-end;
+  text-align: right;
+}
+
+@media (max-width: 700px) {
+  .lector-bar {
+    padding: 10px 12px;
+  }
+  .lector-title {
+    order: -1;
+    width: 100%;
+  }
+  .lector-title .serif {
+    font-size: 15px;
+  }
+  .lector-open {
+    display: none;
+  }
+  .lector-nav {
+    padding: 8px 12px;
+  }
+  .lector-nav-btn strong {
+    font-size: 12px;
+  }
+  .pdf-arrow {
+    width: 36px;
+    height: 52px;
+  }
+  .pdf-zoom-label {
+    display: none;
+  }
+  .pdf-status {
+    padding: 6px 10px;
+  }
+}

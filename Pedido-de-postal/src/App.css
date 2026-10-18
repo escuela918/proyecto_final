@@ -1,0 +1,44 @@
+header {
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  letter-spacing: 0.02em;
+}
+
+.subtitulo {
+  margin-top: 8px;
+  font-style: italic;
+  color: #bbb;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circulo {
+  width: min(280px, 70vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #000;
+  border: 3px solid #fff;
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  font-weight: 700;
+  padding: 24px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.25s;
+}
+
+.circulo:hover,
+.circulo:focus-visible {
+  background: #fff;
+  color: #000;
+  transform: scale(1.05);
+  outline: none;
+}

@@ -1,0 +1,99 @@
+/* =====================================================
+   BIBLIOTECA DIGITAL
+===================================================== */
+
+.clickable-work {
+  cursor: pointer;
+  position: relative;
+}
+
+.clickable-work:focus {
+  outline: 1px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 6px;
+}
+
+
+/* =====================================================
+   OVERLAY DE LA PORTADA
+===================================================== */
+
+.work-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.work-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.work-open-overlay {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.72);
+
+  opacity: 0;
+
+  transition:
+    opacity 0.3s ease,
+    background 0.3s ease;
+
+  pointer-events: none;
+}
+
+.work-open-overlay span {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+
+  padding: 12px 18px;
+
+  font-size: 11px;
+  letter-spacing: 0.12em;
+
+  color: white;
+
+  transform: translateY(10px);
+
+  transition:
+    transform 0.3s ease;
+}
+
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.clickable-work:hover .work-open-overlay {
+  opacity: 1;
+}
+
+.clickable-work:hover .work-open-overlay span {
+  transform: translateY(0);
+}
+
+.clickable-work:hover .work-image img {
+  transform: scale(1.03);
+}
+
+.work-image img {
+  transition: transform 0.5s ease;
+}
+
+
+/* =====================================================
+   TARJETA
+===================================================== */
+
+.clickable-work {
+  transition:
+    transform 0.3s ease;
+}
+
+.clickable-work:hover {
+  transform: translateY(-4px);
+}
