@@ -41,6 +41,7 @@ export const libros: Libro[] = [
     lomo: '#3b2e22',
     alto: 'h-56 sm:h-72',
     pdf: '/pdf/otras-inquisiciones.pdf',
+    pagina: 22,
   },
   {
     id: 'inmortal',
