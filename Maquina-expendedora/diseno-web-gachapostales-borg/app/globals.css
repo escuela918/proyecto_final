@@ -1,0 +1,177 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-sans: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-sepia: var(--sepia);
+  --color-faded: var(--faded);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  color-scheme: dark;
+  /* Tinta, papel antiguo, oro gastado y un gris de página vieja */
+  --ink: #0b0a08;
+  --paper: #efe7d6;
+  --sepia: #c6a46a;
+  --faded: #8f8676;
+
+  --background: var(--ink);
+  --foreground: var(--paper);
+  --card: #14120e;
+  --card-foreground: var(--paper);
+  --popover: #14120e;
+  --popover-foreground: var(--paper);
+  --primary: var(--paper);
+  --primary-foreground: var(--ink);
+  --secondary: #1c1914;
+  --secondary-foreground: var(--paper);
+  --muted: #1c1914;
+  --muted-foreground: var(--faded);
+  --accent: #1c1914;
+  --accent-foreground: var(--paper);
+  --destructive: #8b2e1f;
+  --border: #2b2720;
+  --input: #2b2720;
+  --ring: var(--sepia);
+  --radius: 0.125rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-serif;
+    font-feature-settings: 'liga', 'dlig', 'onum';
+  }
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+@layer utilities {
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.33 0 0 0 0 0.22 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .mirror {
+    transform: scaleY(-1);
+    mask-image: linear-gradient(to top, rgb(0 0 0 / 0.35), transparent 70%);
+    -webkit-mask-image: linear-gradient(to top, rgb(0 0 0 / 0.35), transparent 70%);
+  }
+
+  .fade-up {
+    animation: fade-up 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(6px);
+    transition:
+      opacity 1.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 1.4s cubic-bezier(0.2, 0.7, 0.2, 1),
+      filter 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .reveal[data-visible='true'] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .slow-zoom {
+    animation: slow-zoom 40s ease-in-out infinite alternate;
+  }
+  @keyframes slow-zoom {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(1.12);
+    }
+  }
+
+  .quote-swap {
+    animation: quote-swap 7s ease-in-out both;
+  }
+  @keyframes quote-swap {
+    0% {
+      opacity: 0;
+      filter: blur(8px);
+    }
+    12%,
+    88% {
+      opacity: 1;
+      filter: none;
+    }
+    100% {
+      opacity: 0;
+      filter: blur(8px);
+    }
+  }
+
+  .spine-texture {
+    background-image:
+      linear-gradient(90deg, rgb(0 0 0 / 0.45), transparent 18%, transparent 82%, rgb(0 0 0 / 0.5)),
+      linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up,
+    .slow-zoom,
+    .quote-swap {
+      animation: none;
+    }
+    .reveal {
+      opacity: 1;
+      transform: none;
+      filter: none;
+      transition: none;
+    }
+  }
+}
