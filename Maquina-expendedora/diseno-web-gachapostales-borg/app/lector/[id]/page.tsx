@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { libros } from '@/lib/borges'
+import { VisorPdf } from '@/components/visor-pdf'
 import { BotonVolver } from './boton-volver'
 
 export function generateStaticParams() {
@@ -20,9 +21,9 @@ export default async function Lector({ params }: { params: Promise<{ id: string 
           <p className="truncate text-xs italic text-paper/45">{libro.libro}</p>
         </div>
       </header>
-      <iframe src={libro.pdf} title={libro.titulo} className="w-full flex-1 bg-card" />
+      <VisorPdf src={libro.pdf} pagina={libro.pagina} titulo={libro.titulo} />
       <a
-        href={libro.pdf}
+        href={libro.pagina ? `${libro.pdf}#page=${libro.pagina}` : libro.pdf}
         target="_blank"
         rel="noopener"
         className="border-t border-border px-4 py-3 text-center text-xs uppercase tracking-[0.3em] text-sepia md:hidden"

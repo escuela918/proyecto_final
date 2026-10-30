@@ -10,6 +10,8 @@ export type Libro = {
   lomo: string
   alto: string
   pdf: string
+  // Página del PDF donde empieza el texto (si el libro trae más de uno)
+  pagina?: number
 }
 
 export const libros: Libro[] = [
@@ -25,6 +27,7 @@ export const libros: Libro[] = [
     lomo: '#2a1f17',
     alto: 'h-60 sm:h-80',
     pdf: '/pdf/ficciones.pdf',
+    pagina: 38,
   },
   {
     id: 'wilkins',
