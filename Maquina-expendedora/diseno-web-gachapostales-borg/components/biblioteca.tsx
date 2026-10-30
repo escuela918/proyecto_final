@@ -7,8 +7,11 @@ import { cn } from '@/lib/utils'
 import { Reveal } from '@/components/reveal'
 import { SectionLabel } from '@/components/section-label'
 
-// Guarda el último libro abierto y la posición del scroll para volver al mismo lugar
-const CLAVE = 'biblioteca:ultimo'
+// Guarda el último libro abierto y la posición del scroll para volver al mismo lugar.
+// Si se entró directo al lector (por el QR) no hay scroll guardado y se vuelve al inicio de la biblioteca.
+export const CLAVE = 'biblioteca:ultimo'
+// Marca que el lector se abrió desde la web, así "Volver" puede usar el historial
+export const DESDE_WEB = 'biblioteca:desde-web'
 
 export function Biblioteca() {
   const router = useRouter()
@@ -17,19 +20,23 @@ export function Biblioteca() {
   const libro = indice >= 0 ? libros[indice] : null
 
   useEffect(() => {
-    let guardado: { id: string; scroll: number } | null = null
+    let guardado: { id: string; scroll: number | null } | null = null
     try {
       guardado = JSON.parse(sessionStorage.getItem(CLAVE) ?? 'null')
     } catch {}
     if (!guardado || !libros.some((l) => l.id === guardado.id)) return
     const { id, scroll } = guardado
     setActivo(id)
-    requestAnimationFrame(() => window.scrollTo({ top: scroll, behavior: 'instant' }))
+    requestAnimationFrame(() => {
+      if (typeof scroll === 'number') window.scrollTo({ top: scroll, behavior: 'instant' })
+      else document.getElementById('biblioteca')?.scrollIntoView({ behavior: 'instant' })
+    })
   }, [])
 
   function abrir(id: string) {
     try {
       sessionStorage.setItem(CLAVE, JSON.stringify({ id, scroll: window.scrollY }))
+      sessionStorage.setItem(DESDE_WEB, id)
     } catch {}
     router.push(`/lector/${id}`)
   }

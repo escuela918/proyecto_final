@@ -2,13 +2,20 @@
 
 import { useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
+import { CLAVE, DESDE_WEB } from '@/components/biblioteca'
 
-export function BotonVolver() {
+export function BotonVolver({ id }: { id: string }) {
   const router = useRouter()
 
   function volver() {
-    // Si se entró directo al lector (sin historial), vuelve a la biblioteca
-    if (window.history.length > 1) router.back()
+    let desdeWeb = false
+    try {
+      desdeWeb = sessionStorage.getItem(DESDE_WEB) === id
+      sessionStorage.removeItem(DESDE_WEB)
+      // Si se entró directo al lector (por el QR), la biblioteca abre la tarjeta de este libro
+      if (!desdeWeb) sessionStorage.setItem(CLAVE, JSON.stringify({ id, scroll: null }))
+    } catch {}
+    if (desdeWeb && window.history.length > 1) router.back()
     else router.push('/#biblioteca')
   }
 
