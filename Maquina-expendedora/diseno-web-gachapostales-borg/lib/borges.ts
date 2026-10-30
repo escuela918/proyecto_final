@@ -82,6 +82,20 @@ export const libros: Libro[] = [
     alto: 'h-48 sm:h-[17rem]',
     pdf: '/pdf/el-libro-de-arena.pdf',
   },
+  {
+    id: 'borges-y-yo',
+    postal: '#7a4f6a',
+    titulo: 'Borges y yo',
+    corto: 'Borges y yo',
+    anio: '1960',
+    libro: 'El hacedor',
+    genero: 'Prosa',
+    pregunta: '¿Somos el que vive o el que los otros nombran?',
+    lomo: '#33261c',
+    alto: 'h-56 sm:h-[18rem]',
+    pdf: '/pdf/el-hacedor.pdf',
+    pagina: 20,
+  },
 ]
 
 export type Pensamiento = {

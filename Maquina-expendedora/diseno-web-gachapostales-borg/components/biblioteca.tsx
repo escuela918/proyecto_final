@@ -47,7 +47,7 @@ export function Biblioteca() {
         <Reveal className="mb-14 flex flex-col gap-5 md:mb-20 md:max-w-2xl">
           <SectionLabel>La biblioteca</SectionLabel>
           <h2 className="text-balance text-4xl font-light leading-tight md:text-7xl">
-            Cinco libros de un <em className="text-sepia">anaquel infinito</em>
+            Seis libros de un <em className="text-sepia">anaquel infinito</em>
           </h2>
           <p className="text-pretty text-base leading-relaxed text-paper/65 md:text-lg">
             Elegí un lomo para abrirlo.
