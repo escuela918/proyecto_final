@@ -1,6 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400&display=swap");
-
-/* Reset: pisa los estilos que trae el template de Vite (index.css) */
 *,
 *::before,
 *::after {
@@ -14,7 +11,7 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* sin barra de scroll */
+  overflow: hidden;
   background: #000;
 }
 
@@ -29,8 +26,14 @@ body {
   text-align: center;
 }
 
-/* Pantalla: ocupa exactamente el alto visible */
+/* Unidad base: la pantalla se diseña como un póster 9:16 (1080 x 1920).
+   1u = 1/100 del ancho de ese póster, siempre entra en la pantalla. */
+:root {
+  --u: min(1vw, 0.5625dvh);
+}
+
 .pantalla {
+  position: relative;
   height: 100vh;
   height: 100dvh;
   width: 100%;
@@ -38,56 +41,64 @@ body {
   background: #000;
   color: #fff;
   font-family: "Cormorant Garamond", Garamond, "Times New Roman", serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 6vh 1.5rem 3vh;
   text-align: center;
 }
 
-/* Subtítulo en itálica */
-.bajada {
-  margin: 0;
-  font-style: italic;
-  font-weight: 400;
-  font-size: min(4.2vw, 2.6vh, 2.4rem);
-  line-height: 1.35;
-  letter-spacing: 0.01em;
+.encabezado,
+.centro,
+.pie {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Título principal */
+/* Subtítulo */
+.encabezado {
+  top: 13.5%;
+}
+
+.bajada {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: calc(var(--u) * 5.6);
+  line-height: 1.25;
+}
+
+/* Título */
 .centro {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 43%;
+  transform: translateY(-50%);
 }
 
 .titulo {
   margin: 0;
+  font-family: "Cormorant Garamond", serif;
   font-weight: 400;
   text-transform: uppercase;
-  font-size: min(9.5vw, 6vh, 6.5rem);
-  line-height: 1.12;
-  letter-spacing: 0.03em;
+  font-size: calc(var(--u) * 12.6);
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 /* Botón circular */
 .pie {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-shrink: 0;
+  top: 62%;
 }
 
 .circulo {
-  width: min(58vw, 32vh, 420px);
+  width: calc(var(--u) * 47);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  border: min(1.2vw, 0.7vh, 9px) solid #fff;
-  border-width: max(4px, min(1.2vw, 0.7vh, 9px));
+  border: calc(var(--u) * 0.45) solid #fff;
+  box-shadow:
+    0 0 calc(var(--u) * 0.8) rgba(255, 255, 255, 0.7),
+    inset 0 0 calc(var(--u) * 0.8) rgba(255, 255, 255, 0.5);
   background: #000;
   color: #fff;
   padding: 0;
@@ -95,11 +106,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Cormorant Garamond", Garamond, serif;
-  font-weight: 700;
-  font-size: min(7vw, 4vh, 4.2rem);
-  line-height: 1.05;
-  letter-spacing: 0.02em;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 500;
+  font-size: calc(var(--u) * 7.8);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
   transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -136,11 +147,11 @@ body {
   }
 }
 
-/* Mensaje de estado (reserva su lugar para que nada salte) */
+/* Mensaje de estado */
 .estado {
   height: 1.6em;
-  margin: 1.5vh 0 0;
+  margin: calc(var(--u) * 2) 0 0;
   font-style: italic;
-  font-size: min(3.2vw, 2vh, 1.4rem);
+  font-size: calc(var(--u) * 3.4);
   white-space: nowrap;
 }
