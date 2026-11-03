@@ -31,8 +31,8 @@ body {
   --u: min(1vw, 0.5625dvh);
 }
 
+/* Pantalla: los tres bloques apilados con el mismo espacio entre ellos */
 .pantalla {
-  position: relative;
   height: 100vh;
   height: 100dvh;
   width: 100%;
@@ -41,24 +41,22 @@ body {
   color: #fff;
   font-family: "Cormorant Garamond", Garamond, "Times New Roman", serif;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 7dvh;          /* distancia del borde de arriba a la frase */
+  gap: calc(var(--u) * 13);   /* mismo espacio frase→título y título→círculo */
 }
 
 .encabezado,
 .centro,
 .pie {
-  position: absolute;
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 /* Subtítulo */
-.encabezado {
-  top: 7%;
-}
-
 .bajada {
   margin: 0;
   font-family: "Cormorant Garamond", serif;
@@ -69,11 +67,6 @@ body {
 }
 
 /* Título */
-.centro {
-  top: 43%;
-  transform: translateY(-50%);
-}
-
 .titulo {
   margin: 0;
   font-family: "Cormorant Garamond", serif;
@@ -86,16 +79,7 @@ body {
 }
 
 /* Botón circular */
-.pie {
-  top: 62%;
-}
-
 .circulo {
-    transition:
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-    color 0.3s ease,
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
   width: calc(var(--u) * 47);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -119,6 +103,7 @@ body {
   transition:
     transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
     color 0.3s ease,
+    border-color 0.3s ease,
     box-shadow 0.3s ease;
   /* evita selección de texto y menú al mantener apretado en el celular */
   user-select: none;
@@ -142,6 +127,7 @@ body {
   border-color: #2a2a2a;
   box-shadow: none;
 }
+
 .circulo:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 8px;
