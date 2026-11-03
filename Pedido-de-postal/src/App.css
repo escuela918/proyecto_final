@@ -31,8 +31,9 @@ body {
   --u: min(1vw, 0.5625dvh);
 }
 
-/* Pantalla: los tres bloques apilados con el mismo espacio entre ellos */
+/* Pantalla: mismo espacio arriba, entre los bloques y abajo */
 .pantalla {
+  position: relative;
   height: 100vh;
   height: 100dvh;
   width: 100%;
@@ -44,8 +45,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 7dvh;          /* distancia del borde de arriba a la frase */
-  gap: calc(var(--u) * 13);   /* mismo espacio frase→título y título→círculo */
+  justify-content: space-evenly;
+  padding: 0;
 }
 
 .encabezado,
@@ -137,10 +138,14 @@ body {
   cursor: wait;
 }
 
-/* Mensaje de estado */
+/* Mensaje de estado: abajo de todo, sin ocupar lugar en el reparto de espacios */
 .estado {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3dvh;
   height: 1.6em;
-  margin: calc(var(--u) * 2) 0 0;
+  margin: 0;
   font-style: italic;
   font-size: calc(var(--u) * 3.4);
   white-space: nowrap;
