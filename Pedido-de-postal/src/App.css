@@ -3,10 +3,10 @@
    Todos en 1fr = los cuatro espacios son iguales.
    ========================================================= */
 :root {
-  --espacio-arriba: 1fr;            /* borde de arriba → subtítulo */
+  --espacio-arriba: 0.85fr;            /* borde de arriba → subtítulo */
   --espacio-subtitulo-titulo: 1fr;  /* subtítulo → título */
   --espacio-titulo-circulo: 1fr;    /* título → círculo */
-  --espacio-abajo: 1fr;             /* círculo → borde de abajo */
+  --espacio-abajo: 1.15fr;             /* círculo → borde de abajo */
 
   /* Unidad base: póster 9:16 (1080 x 1920) */
   --u: min(1vw, 0.5625dvh);
