@@ -6,6 +6,8 @@ const SERVIDOR = "http://localhost:3000";
 function App() {
   const [estado, setEstado] = useState("");
   const [cargando, setCargando] = useState(false);
+  const [presionado, setPresionado] = useState(false);
+  const [usado, setUsado] = useState(false);
 
   const girarMotor = async () => {
     setCargando(true);
@@ -24,6 +26,19 @@ function App() {
       setCargando(false);
     }
   };
+
+  const alSoltar = () => setPresionado(false);
+
+  const alHacerClick = () => {
+    setUsado(true);
+    girarMotor();
+  };
+
+  const clases = [
+    "circulo",
+    presionado ? "presionado" : "",
+    usado ? "usado" : "",
+  ].join(" ");
 
   return (
     <div className="pantalla">
@@ -45,24 +60,21 @@ function App() {
 
       <footer className="pie">
         <button
-          className={`circulo ${cargando ? "cargando" : ""}`}
-          onClick={girarMotor}
+          className={clases}
+          onPointerDown={() => setPresionado(true)}
+          onPointerUp={alSoltar}
+          onPointerLeave={alSoltar}
+          onPointerCancel={alSoltar}
+          onContextMenu={(e) => e.preventDefault()}
+          onClick={alHacerClick}
           disabled={cargando}
           aria-label="Pedí tu postal"
         >
-          {cargando ? (
-            <span>
-              ENVIANDO
-              <br />
-              ...
-            </span>
-          ) : (
-            <span>
-              PEDÍ TU
-              <br />
-              POSTAL
-            </span>
-          )}
+          <span>
+            PEDÍ TU
+            <br />
+            POSTAL
+          </span>
         </button>
 
         <p className="estado" aria-live="polite">

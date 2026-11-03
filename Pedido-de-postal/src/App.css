@@ -26,8 +26,7 @@ body {
   text-align: center;
 }
 
-/* Unidad base: la pantalla se diseña como un póster 9:16 (1080 x 1920).
-   1u = 1/100 del ancho de ese póster, siempre entra en la pantalla. */
+/* Unidad base: póster 9:16 (1080 x 1920) */
 :root {
   --u: min(1vw, 0.5625dvh);
 }
@@ -92,6 +91,11 @@ body {
 }
 
 .circulo {
+    transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
   width: calc(var(--u) * 47);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -111,19 +115,33 @@ body {
   font-size: calc(var(--u) * 7.8);
   line-height: 1.02;
   letter-spacing: 0.01em;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
+  transform: scale(1);
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+  /* evita selección de texto y menú al mantener apretado en el celular */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.circulo:hover:not(:disabled) {
-  background: #fff;
-  color: #000;
+/* Mientras se mantiene apretado: se agranda y todo pasa a gris oscuro */
+.circulo.presionado {
+  transform: scale(1.12);
+  color: #2a2a2a;
+  border-color: #2a2a2a;
+  box-shadow: none;
 }
 
-.circulo:active:not(:disabled) {
-  transform: scale(0.96);
+/* Después de soltar: vuelve a su tamaño y queda gris oscuro */
+.circulo.usado {
+  color: #2a2a2a;
+  border-color: #2a2a2a;
+  box-shadow: none;
 }
-
 .circulo:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 8px;
@@ -131,20 +149,6 @@ body {
 
 .circulo:disabled {
   cursor: wait;
-}
-
-.circulo.cargando {
-  animation: latido 1.2s ease-in-out infinite;
-}
-
-@keyframes latido {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.45;
-  }
 }
 
 /* Mensaje de estado */
