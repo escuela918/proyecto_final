@@ -56,7 +56,7 @@ body {
 
 /* Subtítulo */
 .encabezado {
-  top: 13.5%;
+  top: 7%;
 }
 
 .bajada {
@@ -79,7 +79,7 @@ body {
   font-family: "Cormorant Garamond", serif;
   font-weight: 400;
   text-transform: uppercase;
-  font-size: calc(var(--u) * 12.6);
+  font-size: calc(var(--u) * 10.5);
   line-height: 0.92;
   letter-spacing: 0.01em;
   white-space: nowrap;
