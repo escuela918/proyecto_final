@@ -1,85 +1,81 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
-const SERVIDOR = "https://TU-DIRECCION.trycloudflare.com";
-
-// Crea (o recupera) un código único para este dispositivo
-function obtenerIdDispositivo() {
-  try {
-    let id = localStorage.getItem("dispositivoId");
-    if (!id) {
-      id = crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now().toString(36) + Math.random().toString(36).slice(2);
-      localStorage.setItem("dispositivoId", id);
-    }
-    return id;
-  } catch {
-    return "sin-storage-" + Math.random().toString(36).slice(2);
-  }
-}
-
-function leerYaPidio() {
-  try {
-    return localStorage.getItem("yaPidio") === "si";
-  } catch {
-    return false;
-  }
-}
+// Misma PC desde donde se abrió la página, puerto 3000 (server.js)
+const SERVIDOR = `http://${window.location.hostname}:3000`;
 
 function App() {
-  const [estado, setEstado] = useState(
-    leerYaPidio() ? "Ya pediste tu postal desde este dispositivo" : ""
-  );
-  const [cargando, setCargando] = useState(false);
+  const [fase, setFase] = useState("cargando"); // libre | girando | terminado | desconectado | sin-servidor
+  const [restante, setRestante] = useState(0);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState("");
   const [presionado, setPresionado] = useState(false);
-  const [usado, setUsado] = useState(leerYaPidio);
 
-  const marcarComoPedido = () => {
-    setUsado(true);
-    try {
-      localStorage.setItem("yaPidio", "si");
-    } catch {}
-  };
+  // Consulta al servidor cada 1 segundo en qué paso está la máquina
+  useEffect(() => {
+    let activo = true;
+    const consultar = async () => {
+      try {
+        const r = await fetch(`${SERVIDOR}/estado`);
+        const data = await r.json();
+        if (!activo) return;
+        setFase(data.broker ? data.fase : "desconectado");
+        setRestante(data.restante);
+      } catch {
+        if (activo) setFase("sin-servidor");
+      }
+    };
+    consultar();
+    const intervalo = setInterval(consultar, 1000);
+    return () => {
+      activo = false;
+      clearInterval(intervalo);
+    };
+  }, []);
 
   const girarMotor = async () => {
-    setCargando(true);
-    setEstado("");
+    setEnviando(true);
+    setError("");
     try {
-      const r = await fetch(`${SERVIDOR}/girar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dispositivoId: obtenerIdDispositivo() }),
-      });
+      const r = await fetch(`${SERVIDOR}/girar`, { method: "POST" });
       const data = await r.json();
-
       if (data.ok) {
-        marcarComoPedido();
-        setEstado("Pedido enviado, tu postal está saliendo");
-      } else if (data.yaPidio) {
-        marcarComoPedido();
-        setEstado("Ya pediste tu postal desde este dispositivo");
-      } else {
-        setEstado("Error: " + data.error);
+        setFase("girando");
+      } else if (!data.ocupado) {
+        setError("Error: " + data.error);
       }
-    } catch (e) {
-      setEstado("No se pudo contactar al servidor");
+    } catch {
+      setError("No se pudo contactar al servidor");
     } finally {
-      setCargando(false);
+      setEnviando(false);
     }
   };
+
+  const bloqueado = enviando || fase !== "libre";
+
+  // Texto del paso actual
+  let mensaje;
+  if (error) mensaje = error;
+  else if (enviando) mensaje = "Enviando tu pedido...";
+  else if (fase === "girando")
+    mensaje = `Tu postal está saliendo... (${restante}s)`;
+  else if (fase === "terminado") mensaje = "Postal entregada";
+  else if (fase === "libre") mensaje = "Listo, apretá el botón";
+  else if (fase === "desconectado") mensaje = "La máquina no está conectada";
+  else if (fase === "sin-servidor") mensaje = "No se pudo contactar al servidor";
+  else mensaje = "Conectando...";
 
   const alSoltar = () => setPresionado(false);
 
   const alHacerClick = () => {
-    if (usado || cargando) return;
+    if (bloqueado) return;
     girarMotor();
   };
 
   const clases = [
     "circulo",
     presionado ? "presionado" : "",
-    usado ? "usado" : "",
+    bloqueado ? "usado" : "",
   ].join(" ");
 
   return (
@@ -109,7 +105,7 @@ function App() {
           onPointerCancel={alSoltar}
           onContextMenu={(e) => e.preventDefault()}
           onClick={alHacerClick}
-          disabled={cargando || usado}
+          disabled={bloqueado}
           aria-label="Pedí tu postal"
         >
           <span>
@@ -119,8 +115,9 @@ function App() {
           </span>
         </button>
 
-        <p className="estado" aria-live="polite">
-          {estado}
+        {/* Misma tipografía y tamaño que el subtítulo */}
+        <p className="estado bajada" aria-live="polite">
+          {mensaje}
         </p>
       </footer>
     </div>

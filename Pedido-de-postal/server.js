@@ -1,92 +1,118 @@
 import express from 'express';
 import mqtt from 'mqtt';
 import cors from 'cors';
-import fs from 'fs';
 
 const app = express();
 const PORT = 3000;
-const TOPICO = 'expendedora/motor';
-const ARCHIVO_PEDIDOS = './pedidos.json';
-const CLAVE_ADMIN = 'etec2026'; // clave para reiniciar los pedidos (cambiala)
+const BROKER_URL = process.env.BROKER_URL || 'mqtt://10.56.2.30:1883';
+const TOPICO = 'expendedora/motor';          // acá mandamos "girar"
+const TOPICO_ESTADO = 'expendedora/estado';  // acá el ESP avisa "terminado" (opcional)
+const BLOQUEO_MS = 9 * 1000;                 // bloqueado 9 segundos
+const MOSTRAR_ENTREGADA_MS = 2000;           // mínimo que se muestra "Postal entregada"
 
 app.use(cors());
 app.use(express.json());
 
-// ====== Dispositivos que ya pidieron (se guardan en pedidos.json) ======
-let dispositivosQuePidieron = new Set();
-try {
-  const datos = JSON.parse(fs.readFileSync(ARCHIVO_PEDIDOS, 'utf8'));
-  dispositivosQuePidieron = new Set(datos);
-  console.log(`📂 Cargados ${dispositivosQuePidieron.size} pedidos anteriores`);
-} catch {
-  console.log('📂 Sin pedidos anteriores, empezando de cero');
+// ---------- Estado de la máquina ----------
+// fase: 'libre' | 'girando' | 'terminado'
+let fase = 'libre';
+let hasta = 0;         // hasta cuándo dura el bloqueo
+let temporizador = null;
+
+function pasarA(nuevaFase, duracionMs) {
+  clearTimeout(temporizador);
+  fase = nuevaFase;
+  hasta = duracionMs ? Date.now() + duracionMs : 0;
+  console.log('🔁 Fase:', fase);
+
+  if (nuevaFase === 'girando') {
+    // Si el ESP no avisa, se libera solo a los 9 segundos
+    temporizador = setTimeout(() => pasarA('libre'), duracionMs);
+  } else if (nuevaFase === 'terminado') {
+    temporizador = setTimeout(() => pasarA('libre'), duracionMs);
+  }
 }
 
-function guardarPedidos() {
-  fs.writeFileSync(ARCHIVO_PEDIDOS, JSON.stringify([...dispositivosQuePidieron]));
-}
-
-// ====== Conexión al broker Mosquitto ======
-const cliente = mqtt.connect('mqtt://10.56.2.30:1883', {
+// ---------- MQTT ----------
+const cliente = mqtt.connect(BROKER_URL, {
   clientId: 'servidor-expendedora-' + Math.random().toString(16).slice(2, 8),
   reconnectPeriod: 2000,
+  connectTimeout: 5000,
   // username: 'usuario',
   // password: 'clave',
 });
 
-cliente.on('connect', () => console.log('✅ Conectado al broker MQTT 10.56.2.30'));
+cliente.on('connect', () => {
+  console.log(`✅ Conectado al broker MQTT ${BROKER_URL}`);
+  cliente.subscribe(TOPICO_ESTADO, { qos: 1 });
+});
 cliente.on('reconnect', () => console.log('🔄 Reintentando conexión al broker...'));
 cliente.on('offline', () => console.log('⚠️ Broker desconectado'));
 cliente.on('error', (err) => console.error('❌ Error MQTT:', err.message));
 
-// ====== Rutas ======
+// Si el ESP publica "terminado" en expendedora/estado, se desbloquea antes del minuto
+cliente.on('message', (topico, mensaje) => {
+  const texto = mensaje.toString().trim().toLowerCase();
+  console.log('📥', topico, ':', texto);
+  if (topico === TOPICO_ESTADO && ['terminado', 'listo', 'ok'].includes(texto) && fase === 'girando') {
+    // Muestra "entregada" lo que falte de los 9 segundos (mínimo 2 s)
+    pasarA('terminado', Math.max(MOSTRAR_ENTREGADA_MS, hasta - Date.now()));
+  }
+});
+
+// ---------- Rutas ----------
 app.get('/', (req, res) => {
-  res.send(
-    `Servidor funcionando. Broker conectado: ${cliente.connected ? 'SÍ' : 'NO'}. ` +
-    `Pedidos hechos: ${dispositivosQuePidieron.size}`
-  );
+  res.send(`Servidor funcionando. Broker conectado: ${cliente.connected ? 'SÍ' : 'NO'}. Fase: ${fase}`);
+});
+
+// La página consulta esto cada segundo para mostrar en qué paso está
+app.get('/estado', (req, res) => {
+  res.json({
+    fase,
+    restante: hasta ? Math.max(0, Math.ceil((hasta - Date.now()) / 1000)) : 0,
+    broker: cliente.connected,
+  });
 });
 
 app.post('/girar', (req, res) => {
-  const { dispositivoId } = req.body || {};
-
-  if (!dispositivoId) {
-    return res.status(400).json({ ok: false, error: 'Falta el identificador del dispositivo' });
+  if (fase !== 'libre') {
+    return res.status(409).json({ ok: false, ocupado: true, error: 'La máquina está ocupada' });
   }
-
-  if (dispositivosQuePidieron.has(dispositivoId)) {
-    console.log('⛔ Pedido rechazado, el dispositivo ya pidió:', dispositivoId);
-    return res.status(403).json({ ok: false, yaPidio: true, error: 'Este dispositivo ya hizo su pedido' });
-  }
-
   if (!cliente.connected) {
     return res.status(503).json({ ok: false, error: 'Sin conexión al broker' });
   }
 
-  // Se anota antes de publicar para que un doble clic no pase dos veces
-  dispositivosQuePidieron.add(dispositivoId);
+  // Bloqueamos ya, para que nadie más apriete mientras se envía
+  pasarA('girando', BLOQUEO_MS);
+
+  let respondido = false;
+  const timeout = setTimeout(() => {
+    if (respondido) return;
+    respondido = true;
+    pasarA('libre');
+    res.status(504).json({ ok: false, error: 'El broker no respondió' });
+  }, 5000);
 
   cliente.publish(TOPICO, 'girar', { qos: 1 }, (err) => {
+    clearTimeout(timeout);
+    if (respondido) return;
+    respondido = true;
+
     if (err) {
-      dispositivosQuePidieron.delete(dispositivoId); // si falló, puede volver a intentar
       console.error('❌ Error al publicar:', err.message);
+      pasarA('libre');
       return res.status(500).json({ ok: false, error: err.message });
     }
-    guardarPedidos();
-    console.log(`📤 Pedido #${dispositivosQuePidieron.size} enviado (dispositivo ${dispositivoId})`);
+    console.log('📤 Mensaje enviado a', TOPICO, ': girar');
     res.json({ ok: true });
   });
 });
 
-// Para borrar todos los pedidos (por ejemplo, antes de una presentación)
-app.post('/reiniciar', (req, res) => {
-  if (req.body?.clave !== CLAVE_ADMIN) {
-    return res.status(401).json({ ok: false, error: 'Clave incorrecta' });
-  }
-  dispositivosQuePidieron.clear();
-  guardarPedidos();
-  console.log('🧹 Pedidos reiniciados');
-  res.json({ ok: true });
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🌐 Servidor en http://localhost:${PORT}`);
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`🌐 Servidor en http://localhost:${PORT}`));
+process.on('SIGINT', () => {
+  console.log('\n👋 Cerrando servidor...');
+  cliente.end(false, () => process.exit(0));
+});
